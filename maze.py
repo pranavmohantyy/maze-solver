@@ -17,15 +17,19 @@ class Maze:
         self.visited[y][x] = True
         directions = [(0, 2), (2, 0), (0, -2), (-2, 0)]
         random.shuffle(directions)
-
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
             if 0 <= nx < self.width and 0 <= ny < self.height and not self.visited[ny][nx]:
                 self.set_passage(x + dx // 2, y + dy // 2)
                 self.generate_maze(nx, ny)
 
-import random
-
-maze = Maze(10, 10)
-maze.generate_maze()
-maze.render()
+    def solve_maze(self, x=0, y=0):
+        if x == self.width - 1 and y == self.height - 1:
+            return True
+        if 0 <= x < self.width and 0 <= y < self.height and not self.visited[y][x] and self.grid[y][x] == '.':
+            self.visited[y][x] = True
+            if self.solve_maze(x + 1, y) or self.solve_maze(x - 1, y) or self.solve_maze(x, y + 1) or self.solve_maze(x, y - 1):
+                self.grid[y][x] = '*'  # Mark path
+                return True
+            self.visited[y][x] = False
+        return False
