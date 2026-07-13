@@ -14,24 +14,47 @@ class Maze:
                 if (x, y) == self.start:
                     print('\033[91mS\033[0m', end='')
                 elif (x, y) == self.end:
-                    print('\033[94mE\033[0m', end='')
-                elif self.visited[y][x]:
-                    print('\033[92m.\033[0m', end='')
+                    print('\033[92mE\033[0m', end='')
                 else:
                     print(cell, end='')
-            print()
+            print()  
 
-    def set_passage(self, x, y):
-        if 0 <= x < self.width and 0 <= y < self.height:
-            self.grid[y][x] = '.'
+    def generate_maze(self):
+        self.grid[1][1] = ' '
+        walls = [(1, 2), (2, 1)]
+        while walls:
+            wall = walls.pop()  
+            x, y = wall
+            if 0 < x < self.width - 1 and 0 < y < self.height - 1:
+                if (self.grid[y - 1][x] == ' ' and self.grid[y + 1][x] == ' ') or (self.grid[y][x - 1] == ' ' and self.grid[y][x + 1] == ' '):
+                    self.grid[y][x] = ' '
+                    if x - 1 > 0:
+                        walls.append((x - 1, y))
+                    if x + 1 < self.width - 1:
+                        walls.append((x + 1, y))
+                    if y - 1 > 0:
+                        walls.append((x, y - 1))
+                    if y + 1 < self.height - 1:
+                        walls.append((x, y + 1))
 
-    def generate_maze(self, x=0, y=0, speed=0.1):
-        self.visited[y][x] = True
-        directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        random.shuffle(directions)
-        for dx, dy in directions:
-            nx, ny = x + dx * 2, y + dy * 2
-            if 0 <= nx < self.width and 0 <= ny < self.height and not self.visited[ny][nx]:
-                self.set_passage(x + dx, y + dy)
-                self.generate_maze(nx, ny, speed)
-                time.sleep(speed)
+    def prims_algorithm(self):
+        self.grid = [['#' for _ in range(self.width)] for _ in range(self.height)]
+        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        self.grid[1][1] = ' '
+        walls = [(1, 2), (2, 1)]
+        while walls:
+            wall = walls.pop()
+            x, y = wall
+            if 0 < x < self.width - 1 and 0 < y < self.height - 1:
+                if (self.visited[y - 1][x] + self.visited[y + 1][x] + self.visited[y][x - 1] + self.visited[y][x + 1]) == 1:
+                    self.grid[y][x] = ' '
+                    self.visited[y][x] = True
+                    if x - 1 > 0:
+                        walls.append((x - 1, y))
+                    if x + 1 < self.width - 1:
+                        walls.append((x + 1, y))
+                    if y - 1 > 0:
+                        walls.append((x, y - 1))
+                    if y + 1 < self.height - 1:
+                        walls.append((x, y + 1))
+
