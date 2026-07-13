@@ -1,3 +1,5 @@
+from PIL import Image
+
 class Maze:
     def __init__(self, width, height):
         self.width = width
@@ -17,44 +19,22 @@ class Maze:
                     print('\033[92mE\033[0m', end='')
                 else:
                     print(cell, end='')
-            print()  
+            print()
 
-    def generate_maze(self):
-        self.grid[1][1] = ' '
-        walls = [(1, 2), (2, 1)]
-        while walls:
-            wall = walls.pop()  
-            x, y = wall
-            if 0 < x < self.width - 1 and 0 < y < self.height - 1:
-                if (self.grid[y - 1][x] == ' ' and self.grid[y + 1][x] == ' ') or (self.grid[y][x - 1] == ' ' and self.grid[y][x + 1] == ' '):
-                    self.grid[y][x] = ' '
-                    if x - 1 > 0:
-                        walls.append((x - 1, y))
-                    if x + 1 < self.width - 1:
-                        walls.append((x + 1, y))
-                    if y - 1 > 0:
-                        walls.append((x, y - 1))
-                    if y + 1 < self.height - 1:
-                        walls.append((x, y + 1))
+    def export_to_png(self, path):
+        img = Image.new('RGB', (self.width, self.height), color='white')
+        pixels = img.load()
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.grid[y][x] == '#':
+                    pixels[x, y] = (0, 0, 0)
+                elif (x, y) == self.start:
+                    pixels[x, y] = (255, 0, 0)
+                elif (x, y) == self.end:
+                    pixels[x, y] = (0, 255, 0)
+        img.save(path)
 
-    def prims_algorithm(self):
-        self.grid = [['#' for _ in range(self.width)] for _ in range(self.height)]
-        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
-        self.grid[1][1] = ' '
-        walls = [(1, 2), (2, 1)]
-        while walls:
-            wall = walls.pop()
-            x, y = wall
-            if 0 < x < self.width - 1 and 0 < y < self.height - 1:
-                if (self.visited[y - 1][x] + self.visited[y + 1][x] + self.visited[y][x - 1] + self.visited[y][x + 1]) == 1:
-                    self.grid[y][x] = ' '
-                    self.visited[y][x] = True
-                    if x - 1 > 0:
-                        walls.append((x - 1, y))
-                    if x + 1 < self.width - 1:
-                        walls.append((x + 1, y))
-                    if y - 1 > 0:
-                        walls.append((x, y - 1))
-                    if y + 1 < self.height - 1:
-                        walls.append((x, y + 1))
-
+    def overlay_solution(self, solution_path):
+        for x, y in solution_path:
+            if (x, y) != self.start and (x, y) != self.end:
+                self.grid[y][x] = '.'
