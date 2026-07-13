@@ -8,6 +8,9 @@ class Maze:
         self.visited = [[False for _ in range(width)] for _ in range(height)]
         self.start = (0, 0)
         self.end = (width - 1, height - 1)
+        self.nodes_explored = 0
+        self.path_length = 0
+        self.solve_time = 0
 
     def render(self):
         print("\033[H\033[J", end='')
@@ -21,20 +24,19 @@ class Maze:
                     print(cell, end='')
             print()
 
-    def export_to_png(self, path):
-        img = Image.new('RGB', (self.width, self.height), color='white')
-        pixels = img.load()
-        for y in range(self.height):
-            for x in range(self.width):
-                if self.grid[y][x] == '#':
-                    pixels[x, y] = (0, 0, 0)
-                elif (x, y) == self.start:
-                    pixels[x, y] = (255, 0, 0)
-                elif (x, y) == self.end:
-                    pixels[x, y] = (0, 255, 0)
-        img.save(path)
+    def solve(self, algorithm):
+        import time
+        start_time = time.time()
+        if algorithm == 'dfs':
+            self.dfs(self.start[0], self.start[1])
+        elif algorithm == 'bfs':
+            self.bfs(self.start[0], self.start[1])
+        self.solve_time = time.time() - start_time
 
-    def overlay_solution(self, solution_path):
-        for x, y in solution_path:
-            if (x, y) != self.start and (x, y) != self.end:
-                self.grid[y][x] = '.'
+    def dfs(self, x, y):
+        # DFS implementation
+        pass
+
+    def bfs(self, x, y):
+        # BFS implementation
+        pass
